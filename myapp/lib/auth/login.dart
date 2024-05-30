@@ -1,10 +1,11 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, use_build_context_synchronously, use_key_in_widget_constructors, library_private_types_in_public_api, deprecated_member_use
 
 import 'package:flutter/material.dart';
 import 'package:myapp/data/mongo_database.dart';
+import 'package:myapp/screens/welcome_screen.dart';
 import 'sign_up_page.dart';
-import '../home_page.dart';
-import '../forgot_password_page.dart';
+import '../screens/home_page.dart';
+import 'forgot_password_page.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -67,11 +68,24 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     final theme = Theme.of(context);
 
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.blue.shade800,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
       body: Stack(
         children: [
-          // Animated Gradient Background
+          //Animated Gradient Background
           AnimatedContainer(
-            duration: Duration(seconds: 5),
+            duration: Duration(seconds: 7),
             onEnd: () {
               setState(() {});
             },
@@ -95,6 +109,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(25.0),
                   ),
+                  shadowColor: Colors.grey.withOpacity(0.7),
                   child: Padding(
                     padding: const EdgeInsets.all(24.0),
                     child: Column(
@@ -146,7 +161,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                         ),
                         SizedBox(height: 10),
                         _buildTextButton(
-                          label: "Tu as déjà une compte, S'inscrire",
+                          label: "J'ai pas un compte, S'inscrire",
                           onPressed: () {
                             Navigator.push(
                               context,
@@ -191,6 +206,15 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   }) {
     return AnimatedContainer(
       duration: Duration(milliseconds: 300),
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
       child: TextField(
         controller: controller,
         decoration: InputDecoration(
@@ -213,6 +237,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
 
   Widget _buildLoginButton() {
     return ElevatedButton(
+      key: ValueKey<int>(2),
       style: ElevatedButton.styleFrom(
         foregroundColor: Colors.white,
         backgroundColor: Colors.blue,
@@ -221,9 +246,20 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           horizontal: 32.0,
         ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15.0),
+          borderRadius: BorderRadius.circular(25.0),
         ),
         textStyle: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+        elevation: 10,
+        shadowColor: Colors.blueAccent,
+      ).copyWith(
+        elevation: MaterialStateProperty.resolveWith<double>(
+          (Set<MaterialState> states) {
+            if (states.contains(MaterialState.pressed)) {
+              return 15;
+            }
+            return 10; // Default elevation
+          },
+        ),
       ),
       onPressed: _login,
       child: Text('Se Connecter'),
@@ -233,14 +269,15 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   Widget _buildTextButton(
       {required String label, required VoidCallback onPressed}) {
     return TextButton(
-      onPressed: onPressed,
-      child: Text(
-        label,
-        style: TextStyle(
-          color: Colors.blue,
+      style: TextButton.styleFrom(
+        foregroundColor: Colors.blue,
+        textStyle: TextStyle(
           decoration: TextDecoration.underline,
+          fontSize: 16,
         ),
       ),
+      onPressed: onPressed,
+      child: Text(label),
     );
   }
 }

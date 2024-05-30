@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/data/mongo_database.dart';
-import 'package:myapp/verify_code_page.dart';
+import 'package:myapp/auth/verify_code_page.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   @override
