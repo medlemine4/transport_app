@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/data/mongo_database.dart';
 import 'package:myapp/login.dart';
+import 'package:myapp/verify_page.dart';
 
 class SignUpPage extends StatefulWidget {
   @override
@@ -57,7 +58,7 @@ class _SignUpPageState extends State<SignUpPage> {
     });
 
     try {
-      final success = await MongoDatabase.signUp(email, password);
+      final success = await MongoDatabase.sendVerificationCode(email);
 
       setState(() {
         _isLoading = false;
@@ -68,14 +69,14 @@ class _SignUpPageState extends State<SignUpPage> {
           context: context,
           builder: (context) => AlertDialog(
             title: Text('Succès'),
-            content: Text('Compte créé avec succès.'),
+            content: Text('verifier votre gmail.'),
             actions: [
               ElevatedButton(
                 onPressed: () {
                   Navigator.pop(context);
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => LoginPage()),
+                    MaterialPageRoute(builder: (context) => VerifyPage(email: email, Password: password,)),
                   );
                 },
                 child: Text('OK'),

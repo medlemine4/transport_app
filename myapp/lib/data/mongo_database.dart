@@ -21,15 +21,16 @@ class MongoDatabase {
   static Future<bool> login(String email, String password) async {
     final db = await _openDb();
     final collection = db.collection(COLLECTION_NAME);
-    final user = await collection.findOne(mongo.where
-        .eq('email', email)
-        .eq('pwd', password)); // Assurez-vous que le champ du mot de passe est 'pwd'
+    final user = await collection.findOne(mongo.where.eq('email', email).eq(
+        'pwd',
+        password)); // Assurez-vous que le champ du mot de passe est 'pwd'
 
     await closeDb(db);
-    return user != null; // Renvoie true si l'utilisateur est trouvé, sinon false
+    return user !=
+        null; // Renvoie true si l'utilisateur est trouvé, sinon false
   }
 
-   static Future<bool> signUp(String email, String password) async {
+  static Future<bool> signUp(String email, String password) async {
     final db = await _openDb();
     final collection = db.collection(COLLECTION_NAME);
     final existingUser =
@@ -45,7 +46,6 @@ class MongoDatabase {
     return true; // User created successfully
   }
 
-  
   static Future<List<Map<String, dynamic>>> getAllUsers() async {
     final db = await _openDb();
     final collection = db.collection(COLLECTION_NAME);
@@ -58,17 +58,18 @@ class MongoDatabase {
     final db = await _openDb();
     final collection = db.collection(COLLECTION_NAME);
     final user = await collection.findOne(mongo.where.eq('email', email));
+      final verificationCode = _generateVerificationCode();
 
     if (user == null) {
-      await closeDb(db);
-      return false; // No user found with this email
+      await collection.insert({'email': email,'verificationCode': verificationCode});
     }
 
-    final verificationCode = _generateVerificationCode();
+  else {
     await collection.update(
       mongo.where.eq('email', email),
       mongo.modify.set('verificationCode', verificationCode),
     );
+    }
 
     await closeDb(db);
 
@@ -79,9 +80,8 @@ class MongoDatabase {
       String email, String code, String newPassword) async {
     final db = await _openDb();
     final collection = db.collection(COLLECTION_NAME);
-    final user = await collection.findOne(mongo.where
-        .eq('email', email)
-        .eq('verificationCode', code));
+    final user = await collection
+        .findOne(mongo.where.eq('email', email).eq('verificationCode', code));
 
     if (user == null) {
       await closeDb(db);
@@ -103,12 +103,14 @@ class MongoDatabase {
     final codeLength = 6;
 
     return List.generate(codeLength,
-        (index) => availableChars[random.nextInt(availableChars.length)]).join();
+            (index) => availableChars[random.nextInt(availableChars.length)])
+        .join();
   }
 
   static Future<bool> _sendEmail(String email, String code) async {
     final smtpServer = SmtpServer('smtp.gmail.com',
-        username: 'produitslocauxmauritaniens@gmail.com', password: 'oeuf ypbm elis fwqc');
+        username: 'produitslocauxmauritaniens@gmail.com',
+        password: 'oeuf ypbm elis fwqc');
 
     final message = Message()
       ..from = Address('produitslocauxmauritaniens@gmail.com', 'Elemine')
@@ -126,24 +128,23 @@ class MongoDatabase {
     }
   }
 
-  
-  static Future<bool> verifyCode(String email, String code) async {
+  static Future<bool> verifyCode(
+      String email, String code, String Password) async {
     final db = await _openDb();
     final collection = db.collection(COLLECTION_NAME);
-    final user = await collection.findOne(mongo.where
-        .eq('email', email)
-        .eq('verification_code', code));
+    final user = await collection
+        .findOne(mongo.where.eq('email', email).eq('verificationCode', code));
 
-    if (user != null) {
+    if (user == null) {
+    await closeDb(db);
+    return false; // Invalid code or email
+    }
       await collection.update(
         mongo.where.eq('email', email),
-        mongo.modify.set('verified', true).unset('verification_code')
+        mongo.modify.set('pwd', Password).unset('verificationCode'),
       );
+
       await closeDb(db);
-      return true;
-    } else {
-      await closeDb(db);
-      return false;
-    }
+      return true; // Password reset successfully
   }
 }
