@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/data/mongo_database.dart';
-import 'package:myapp/login.dart';
+import 'package:myapp/auth/login.dart';
 import 'package:myapp/verify_page.dart';
 
 class SignUpPage extends StatefulWidget {
